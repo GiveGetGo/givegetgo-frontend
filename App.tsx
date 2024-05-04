@@ -4,22 +4,28 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Provider } from 'react-redux';
 import store from './store';
 import LoginScreen from './screens/LoginScreen';
+import MfaScreen from './screens/MfaScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
-import CheckEmailScreen from './screens/CheckEmailScreen'; 
+import CheckEmailScreen from './screens/CheckEmailScreen';
+import ResetCheckEmailScreen from './screens/ResetCheckEmailScreen';  
 import ConfirmationScreen from './screens/ConfirmationScreen'; 
 import MainScreen from './screens/MainScreen'; 
 import GiveOutContactScreen from './screens/GiveOutContactScreen'; 
+import ResetPasswordScreen from './screens/ResetPasswordScreen'; 
 
 export type RootStackParamList = {
   LoginScreen: undefined;
+  nfaScreen: undefined;
   ForgotPasswordScreen: undefined;
   SignUpScreen: undefined;
   CheckEmailScreen: undefined;
+  ResetCheckEmailScreen: undefined;
   ConfirmationScreen: undefined;
   MainScreen: undefined;
   GiveOutContactScreen: undefined;
   SettingsScreen: undefined;
+  ResetPasswordScreen: undefined;
 };
 
 const MainStack = createStackNavigator<RootStackParamList>();
@@ -30,12 +36,15 @@ const App: React.FC = () => {
       <NavigationContainer>
         <MainStack.Navigator initialRouteName="LoginScreen">
           <MainStack.Screen name="LoginScreen" component={LoginScreen} options={{ title: 'Login', headerShown: false }} />
+          <MainStack.Screen name="MfaScreen" component={MfaScreen} options={{ title: 'MFA', headerShown: false }} />
           <MainStack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ title: 'Forgot Password', headerShown: false }} />
           <MainStack.Screen name="SignUpScreen" component={SignUpScreen} options={{ title: 'Sign Up', headerShown: false }} />
           <MainStack.Screen name="CheckEmailScreen" component={CheckEmailScreen} options={{ title: 'Check Email', headerShown: false }} />
+          <MainStack.Screen name="ResetCheckEmailScreen" component={ResetCheckEmailScreen} options={{ title: 'Reset Check Email', headerShown: false }} />
           <MainStack.Screen name="ConfirmationScreen" component={ConfirmationScreen} options={{ title: 'Confirm', headerShown: false }} />
           <MainStack.Screen name="MainScreen" component={MainScreen} options={{ title: 'Main', headerShown: false }} />
-          <MainStack.Screen name="GiveOutContactScreen" component={GiveOutContactScreen} options={{ title: 'GiveOutContact', headerShown: false }} />
+          <MainStack.Screen name="GiveOutContactScreen" component={GiveOutContactScreen} options={{ title: 'Give Out Contact', headerShown: false }} />
+          <MainStack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{ title: 'Reset Password', headerShown: false }} />
           {/* You can add more screens to the navigator as needed */}
         </MainStack.Navigator>
       </NavigationContainer>
@@ -53,23 +62,28 @@ export default App;
 // justifyContent: 'center', // Center contents vertically // alignItems: 'center', // Center contents horizontally
 // following up, those positioned "absolute" will not be counted in when using justifyContent or alignItems
 
-// Api Spec:
-// LoginScreen: 'user/login' (DONE) (Now uncommented) (NEED TO CHANGE) (add post mfa and its page)
-// Notifications: 
-// get qr code (get mfa) in registerScreen
-// SignUpScreen: 'user/register' works, '/mfa' needs to be fixed and test (NEED TO CHANGE) (Email Verification)
-// CheckEmailScreen:　'verification/verify-email' needs to be fixed and test, '/mfa' needs to get checked if 'email' is passed; 'user/me' needs to test (NEED TO CHANGE)
-// ForgotPasswordScreen: '/user/forgot-password' needs to test 
+// Api Spec (have to test on server/localhost):
+// LoginScreen: 'user/login' (DONE) (Now uncommented), need to navigate to "mfaScreen" to call "post mfa" if no session 
+// SignUpScreen: 'user/register' works, need "get mfa" (maybe need a new page or modal to demo qrcode),"request email" and lead to checkEmailScreen to call "email-verification " and 'user/me', then "confirmationScreen" that needs "get user/me" 
+// ForgotPasswordScreen: '/user/forgot-password' needs to test, and further pages (see below)
+// CheckEmailScreen, ResetCheckEmailScreen
+// RestPasswordScreen
+// MfaScreen
+// ConfirmationScreen
+// Notifications
+// SettingsScreen
+// 剩下就是bid, match, profile相關的, 還需要get history, put/get rate 等api
 
 // Main tasks:
-// connect api, starting from loginScreen 
+// first make sure all api connections are made (api on or off version commented), then run docker and test api
+// login api 照做 其他用default資料(catch deefault, 即使api fetch成功) (mention in documentation)
 // NotificationStackProfileScreen needs api stuff 
+// login邏輯 (loginScreen->"mfaScreen"->"mfaConfirmScreen") ("" are pages not existed yet) (maybe confirmation screens could just be modals)
+// forgetPassword 邏輯 (forgetScreen->checkEmailScreen->confirmationScreen (remove this)->"ResetScreen"-> "ResetConfirmedScreen") 
 // PostDetailsScreen proly should link to NotificationStackProfileScreen? (which is in another stack) (see which way works easier) (now ProfileScreen has redux)
-// format CheckEmailScreen, ConfirmationScreen
-// filterPost not sorking due to separating fiels to two
+// filterPost not sorting due to separating fiels to two (AKA might have problem when there's no post in the db)
 // Comfirm match logic in notification
 // figure out what this is: Network error: [SyntaxError: JSON Parse error: Unexpected character: L]
-
 // hook expo-font (might need) ()so far imported but not really used
 
 // if have time: 

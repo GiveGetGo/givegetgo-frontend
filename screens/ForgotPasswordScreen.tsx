@@ -8,12 +8,13 @@ type RootStackParamList = {
   ForgotPasswordScreen: undefined;
   CheckEmailScreen: undefined;
   SignUpScreen: undefined;
+  ResetCheckEmailScreen: undefined;
 };
 
 // Define the type for the navigation prop
 type ScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'ForgotPasswordScreen' | 'CheckEmailScreen' | 'SignUpScreen'
+  'ForgotPasswordScreen' | 'ResetCheckEmailScreen' | 'SignUpScreen'
 >;
 
 const ForgotPasswordScreen: React.FC = () => {
@@ -21,14 +22,13 @@ const ForgotPasswordScreen: React.FC = () => {
   const [email, setEmail] = useState<string>('');
 
   const handleResetPassword = () => {
-    // Handle the reset password logic
-    navigation.navigate('CheckEmailScreen');
+    navigation.navigate('ResetCheckEmailScreen'); //comment this when using api
+    // forgotPassword(email) //uncomment this when using api
     console.log('Reset password for:', email);
   };
 
   const handleSignUp = () => {
-    // navigation.navigate('SignUpScreen');
-    forgotPassword(email)
+    navigation.navigate('SignUpScreen'); 
   };
 
   async function forgotPassword(email: string) {
@@ -46,8 +46,8 @@ const ForgotPasswordScreen: React.FC = () => {
   
       if (response.status === 200) {
         console.log('Forgot password request successful:', json);
-        alert('Password reset instructions have been sent to your email.');
-        navigation.navigate('SignUpScreen');
+        // alert('Password reset instructions have been sent to your email.'); //uncomment this if using api
+        // navigation.navigate('ResetCheckEmailScreen'); //uncomment this if using api
       } else if (response.status === 400) {
         console.error('Bad request:', json.msg);
         alert(`Error: ${json.msg}`);
@@ -66,7 +66,7 @@ const ForgotPasswordScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert('Failed to connect to the server. Please try again later.');
+      // alert('Failed to connect to the server. Please try again later.'); //uncomment this if using api
     }
   }
 

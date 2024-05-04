@@ -8,16 +8,16 @@ import { useFonts, Montserrat_700Bold_Italic } from '@expo-google-fonts/montserr
 import requestMFASetup from './SignUpScreen'
 
 type RootStackParamList = {
-  CheckEmailScreen: undefined;
-  ConfirmationScreen: undefined;
+  ResetCheckEmailScreen: undefined;
+  ResetPasswordScreen: undefined;
 };
 
 type ScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'CheckEmailScreen' | 'ConfirmationScreen'
+  'ResetCheckEmailScreen' | 'ResetPasswordScreen'
 >;
 
-const CheckEmailScreen: React.FC = () => {
+const ResetCheckEmailScreen: React.FC = () => {
 
   const [fontsLoaded] = useFonts({ Montserrat_700Bold_Italic });
 
@@ -37,14 +37,14 @@ const CheckEmailScreen: React.FC = () => {
       setCode(text);
       if (text.length === 7) {
         handleCodeComplete(text);
-        navigation.navigate('ConfirmationScreen'); //comment this when testing api
+        navigation.navigate('ResetPasswordScreen'); //comment this when testing api
         // verifyEmailCode(email, 'register', text) //uncomment this when testing api
       }
     }
   };
 
-  const handleConfirm = () => { // when verification passes             
-    navigation.navigate('ConfirmationScreen');
+  const handleConfirm = () => { // called in an api case
+    navigation.navigate('ResetPasswordScreen');
   };
 
   const handleResendCode = () => {
@@ -74,22 +74,21 @@ const CheckEmailScreen: React.FC = () => {
         handleConfirm();
         // You can navigate to another screen or update the UI accordingly
       } else if (response.status === 400) {
-        // console.error('Bad request:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
+        console.error('Bad request:', json.msg);
+        alert(`Error: ${json.msg}`);
       } else if (response.status === 401) {
-        // console.error('Unauthorized:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
+        console.error('Unauthorized:', json.msg);
+        alert(`Error: ${json.msg}`);
       } else if (response.status === 500) {
-        // console.error('Internal server error:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
+        console.error('Internal server error:', json.msg);
+        alert(`Error: ${json.msg}`);
       } else {
-        // console.error('Unexpected error:', json);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
+        console.error('Unexpected error:', json);
+        alert(`Error: ${json.msg}`);
       }
     } catch (error) {
-      // console.error('Network error:', error);  // uncomment this if using api
-      // alert('Failed to connect to the server. Please try again later.');  // uncomment this if using api
-      setCode('');
+      console.error('Network error:', error);
+      alert('Failed to connect to the server. Please try again later.');
     }
   }
 
@@ -99,9 +98,9 @@ const CheckEmailScreen: React.FC = () => {
       try {
         const response = await fetch('http://api.givegetgo.xyz/v1/user/me');
         const json = await response.json();
-        setEmail(json.email); 
+        setEmail(json.email); // Adjust this depending on the structure of your JSON
       } catch (error) {
-        // console.error(error);  // uncomment this if using api
+        // console.error(error);
       }
     };
 
@@ -220,4 +219,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CheckEmailScreen;
+export default ResetCheckEmailScreen;

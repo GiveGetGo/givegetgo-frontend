@@ -9,12 +9,13 @@ type RootStackParamList = {
   ForgotPasswordScreen: undefined;
   SignUpScreen: undefined;
   MainScreen: undefined;
+  MfaScreen: undefined;
 };
 
 // Define the type for the navigation prop
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'ForgotPasswordScreen' | 'SignUpScreen' | 'MainScreen'
+  'ForgotPasswordScreen' | 'SignUpScreen' | 'MainScreen' | 'MfaScreen'
 >;
 
 const LoginScreen: React.FC = () => {
@@ -31,8 +32,9 @@ const LoginScreen: React.FC = () => {
   };
   
   const handleLogin = async () => {
-    navigation.navigate('MainScreen'); 
-    // showModal('Login failed: Incorrect email or password.'); //uncomment this to format modal
+    // navigation.navigate('MainScreen'); 
+    navigation.navigate('MfaScreen'); //comment this if using api call
+    // showModal('Login failed: Incorrect email or password.'); //uncomment this to use modal
     try {
       const response = await fetch('http://api.givegetgo.xyz/v1/user/login', {
         method: 'POST',
@@ -51,16 +53,17 @@ const LoginScreen: React.FC = () => {
   
       if (response.status === 200) {
         console.log('Login successful:', json);
-        navigation.navigate('MainScreen'); // Navigate to the main screen on success
+        // navigation.navigate('MainScreen'); 
+        navigation.navigate('MfaScreen'); 
       } else {
         // Handle different types of errors based on response status
-        console.error('Login failed:', json.msg);
-        // alert(`Login failed: ${json.msg}`);   uncomment this
+        // console.error('Login failed:', json.msg); const json = await response.json();
+        // alert(`Login failed: ${json.msg}`);   //uncomment this if using api
       }
     } catch (error) {
       // Handle network errors or other unexpected issues
-      console.error('Network error:', error);
-      // alert('Failed to connect to the server. Please try again later.');
+      // console.error('Network error:', error); const json = await response.json();
+      // alert('Failed to connect to the server. Please try again later.');   //uncomment this if using api
     }
   };
 

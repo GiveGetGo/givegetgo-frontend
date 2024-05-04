@@ -343,13 +343,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }: HomeScreenProps) 
     
             if (response.ok) {
               const json = await response.json();
-              setPosts(json.data); // Assuming the JSON response structure matches your state structure
+              setPosts(json.data); 
             } else {
               throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
           } catch (error) {
-            console.error('Error fetching posts:', error);
-            // Optionally alert the user or handle the error visually in the UI
+            // console.error('Error fetching posts:', error); // console.error(error); uncomment this if using api
           }
         };
     
@@ -529,17 +528,19 @@ const NotificationScreen: React.FC<NotificationsProps> = ({ navigation }: Notifi
     const [fontsLoaded] = useFonts({ Montserrat_700Bold_Italic }); 
 
     const [notifications, setNotifications] = React.useState<Notification[]>(notifications_data);      
-    
-    useEffect(() => {                                                                     //fill this in to get db info
-        const fetchNotificationsData = async () => {
+
+    useEffect(() => {
+        // Fetch the notification data from the backend
+        const fetchNotificationsData = async () => {                        
           try {
-            const response = await fetch('URL_TO_YOUR_BACKEND/notifications_data_endpoint');
+            const response = await fetch('http://api.givegetgo.xyz/v1/notification');
             const json = await response.json();
-            setNotifications(json); // Adjust this depending on the structure of your JSON
+            setNotifications(json); 
           } catch (error) {
-            // console.error(error); // uncomment this after finish frontend developing
+            // console.error(error); uncomment this if using api
           }
         };
+    
         fetchNotificationsData();
       }, []);
 
@@ -633,16 +634,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }: SettingsS
                 bio: json.data.profile_info, 
                 profilePicture: json.data.profile_image
               });
-              dispatch(setAvatarUri(json.data.profile_image));
+            //   dispatch(setAvatarUri(json.data.profile_image));  // uncomment this if using api
               console.log("New Avatar from backend: ", json.data.profile_image)
               console.log("Bio: ", json.data.profile_info)
               console.log("Fetched userInfo: ", userInfo)
             } else {
               // Handle errors
-              console.error('Failed to fetch user info:', response.status);
+            //   console.error('Failed to fetch user info:', response.status);  // uncomment this if using api
             }
           } catch (error) {
-            console.error('Network error when fetching user info:', error);
+            // console.error('Network error when fetching user info:', error);  // uncomment this if using api
           }
         };
     
@@ -669,37 +670,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }: SettingsS
             profile_image: updatedUserInfo.profilePicture
         };
         try {
+            setUserInfo(updateUserInfo(userInfo, updatedUserInfo));  // comment this if using api
+            dispatch(setAvatarUri(updatedUserInfo.profilePicture));  // comment this if using api
             console.log("payload: ",payload)
             const response = await fetch('http://api.givegetgo.xyz/v1/user/me', {                 
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // body: JSON.stringify({
-                //     username: updates.name,
-                //     email: updates.email, // Assuming you can update email via PUT
-                //     class: updates.classYear,
-                //     major: updates.major,
-                //     profileInfo: updates.bio, // Assuming you want to update bio or similar
-                //     profile_image: updates.profilePicture
-                // }),
                 body: JSON.stringify(payload),
             });
     
             if (response.ok) {
                 const json = await response.json();
                 console.log('Profile updated successfully:', json);
-                setUserInfo(updateUserInfo(userInfo, updatedUserInfo));
+                // setUserInfo(updateUserInfo(userInfo, updatedUserInfo));  // uncomment this if using api
                 // update redux
-                dispatch(setAvatarUri(updatedUserInfo.profilePicture));
+                // dispatch(setAvatarUri(updatedUserInfo.profilePicture));  // uncomment this if using api
             } else {
                 // Handle errors
-                const errorJson = await response.json();
-                alert(`Failed to update profile: ${errorJson.msg}`);
+                // const errorJson = await response.json();  // uncomment this if using api
+                // alert(`Failed to update profile: ${errorJson.msg}`);  // uncomment this if using api
             }
         } catch (error) {
-            console.error('Network error when updating user info:', error);
-            alert('Failed to connect to the server. Please try again later.');
+            // console.error('Network error when updating user info:', error);  // uncomment this if using api
+            // alert('Failed to connect to the server. Please try again later.');  // uncomment this if using api
         }
     };
 
@@ -771,12 +766,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }: SettingsS
     };
 
     const handleLogOutApi = async () => {
+        handleLogOut() // comment this if using api
         try {
             const response = await fetch('http://api.givegetgo.xyz/v1/user/logout', {
                 method: 'GET',
                 credentials: "include",
                 headers: {
-                    // 'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
             });
     
@@ -784,18 +780,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }: SettingsS
             console.log("Logout response:", json);
     
             if (response.status === 200) {
-                console.log('User logged out successfully:', json);
-                handleLogOut()
+                // console.log('User logged out successfully:', json);  // uncomment this if using api
+                // handleLogOut()  // uncomment this if using api
             } else if (response.status === 500) {
-                console.error('Internal server error:', json.msg);
-                alert(`Error: ${json.msg}`);
+                // console.error('Internal server error:', json.msg);  // uncomment this if using api
+                // alert(`Error: ${json.msg}`);  // uncomment this if using api
             } else {
-                console.error('Unexpected error during logout:', json);
-                alert(`Error: ${json.msg}`);
+                // console.error('Unexpected error during logout:', json);  // uncomment this if using api
+                // alert(`Error: ${json.msg}`);  // uncomment this if using api
             }
         } catch (error) {
-            console.error('Network error during logout:', error);
-            alert('Failed to connect to the server. Please try again later.');
+            // console.error('Network error during logout:', error); // uncomment this if using api
+            // alert('Failed to connect to the server. Please try again later.');  // uncomment this if using api
         }
     };
 

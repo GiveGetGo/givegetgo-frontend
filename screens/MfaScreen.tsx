@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -8,16 +8,16 @@ import { useFonts, Montserrat_700Bold_Italic } from '@expo-google-fonts/montserr
 import requestMFASetup from './SignUpScreen'
 
 type RootStackParamList = {
-  CheckEmailScreen: undefined;
-  ConfirmationScreen: undefined;
+  MfaScreen: undefined;
+  MainScreen: undefined;
 };
 
 type ScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'CheckEmailScreen' | 'ConfirmationScreen'
+  'MfaScreen' | 'MainScreen'
 >;
 
-const CheckEmailScreen: React.FC = () => {
+const MfaScreen: React.FC = () => {
 
   const [fontsLoaded] = useFonts({ Montserrat_700Bold_Italic });
 
@@ -25,88 +25,59 @@ const CheckEmailScreen: React.FC = () => {
 
   const navigation = useNavigation<ScreenNavigationProp>();
   const [code, setCode] = useState('');
-  const [email, setEmail] = useState<string>('xxx@gmail.com');
+
+  const successAlert = () => {
+    // Alert.alert("Success", "MFA confirmation succeeded!");
+    navigation.navigate('MainScreen');
+  };
+
+  const failureAlert = () => {
+      Alert.alert("Error", "MFA confirmation failed!");
+      setCode('');
+  };
 
   const handleCodeComplete = (code: string) => {
-    // This function is triggered when all seven digits are entered
     console.log('Code entered:', code);
-    // Add your logic here, for example navigate to a new screen or verify the code
+    verifyMFACode(code) // make POST mfa api call here
   };
   const handleCodeChange = (text: string) => {
-    if (text.length <= 7) {
+    if (text.length <= 6) {
       setCode(text);
-      if (text.length === 7) {
-        handleCodeComplete(text);
-        navigation.navigate('ConfirmationScreen'); //comment this when testing api
-        // verifyEmailCode(email, 'register', text) //uncomment this when testing api
+      if (text.length === 6) {
+        handleCodeComplete(text); 
       }
     }
-  };
-
-  const handleConfirm = () => { // when verification passes             
-    navigation.navigate('ConfirmationScreen');
   };
 
   const handleResendCode = () => {
     requestMFASetup
   };
 
-  async function verifyEmailCode(email: string, event: string, verificationCode: string) {
+  async function verifyMFACode(code: string) {
     try {
-      const response = await fetch('http://api.givegetgo.xyz/v1/verification/verify-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          event: event,
-          verification_code: verificationCode
-        }),
-      });
-  
-      const json = await response.json(); // Parse the JSON response
-      console.log("Verification response:", json);
-  
-      if (response.status === 200) {
-        console.log('Email verified successfully:', json);
-        alert('Email verified successfully!');
-        handleConfirm();
-        // You can navigate to another screen or update the UI accordingly
-      } else if (response.status === 400) {
-        // console.error('Bad request:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
-      } else if (response.status === 401) {
-        // console.error('Unauthorized:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
-      } else if (response.status === 500) {
-        // console.error('Internal server error:', json.msg);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
-      } else {
-        // console.error('Unexpected error:', json);  // uncomment this if using api
-        // alert(`Error: ${json.msg}`);  // uncomment this if using api
-      }
+        successAlert() //comment this if using api call
+        const response = await fetch('http://api.givegetgo.xyz/v1/mfa', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ verification_code: code }),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result.code === 20000) {
+                // successAlert();  //uncomment this if using api call
+            } else {
+                // failureAlert();  //uncomment this if using api call
+            }
+        } else {
+            // failureAlert();  //uncomment this if using api call
+        }
     } catch (error) {
-      // console.error('Network error:', error);  // uncomment this if using api
-      // alert('Failed to connect to the server. Please try again later.');  // uncomment this if using api
-      setCode('');
+        // failureAlert();  //uncomment this if using api call
     }
-  }
-
-  useEffect(() => {
-    // Fetch the email from the backend
-    const fetchEmail = async () => {                        
-      try {
-        const response = await fetch('http://api.givegetgo.xyz/v1/user/me');
-        const json = await response.json();
-        setEmail(json.email); 
-      } catch (error) {
-        // console.error(error);  // uncomment this if using api
-      }
-    };
-
-    fetchEmail();
-  }, []);
+}
 
 return (
   <SafeAreaView style={styles.container}>
@@ -115,17 +86,17 @@ return (
         <Text style={styles.header}>GiveGetGo</Text>
         <View style={styles.backActionPlaceholder} />
     </View>
-    <MaterialCommunityIcons name="email-outline" size={100} color="#000" />
-    <Text style={styles.title}>Check Your Email</Text>
+    <MaterialCommunityIcons name="alert-octagon-outline" size={100} color="#000" />
+    <Text style={styles.title}>Check Your MFA code</Text>
     <Text style={styles.subtitle1}>
-      We have sent an email to {email} to confirm the validity of this email address.
+      We have sent a set of code to your authenticator to confirm your validity.
     </Text>
     <Text style={styles.subtitle2}>
-      Please enter the 7-digit code below.
+      Please enter the 6-digit code below.
     </Text>
     <TextInput
       style={styles.codeInput}
-      placeholder="_ _ _ _ _ _ _"
+      placeholder="_ _ _ _ _ _"
       value={code}
       onChangeText={handleCodeChange}
       keyboardType="number-pad"
@@ -202,7 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     borderBottomColor: 'grey',
     textAlign: 'center',
-    marginTop: -20,
+    marginTop: -30,
     marginBottom: 5,
   },
   button: {
@@ -220,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CheckEmailScreen;
+export default MfaScreen;

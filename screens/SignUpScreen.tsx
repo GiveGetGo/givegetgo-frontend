@@ -31,7 +31,7 @@ const SignUpScreen: React.FC = () => {
   };
 
   async function registerUser(email: string, password: string, schoolClass: string, major: string) {
-    navigation.navigate('CheckEmailScreen'); //for testing
+    navigation.navigate('CheckEmailScreen'); //comment this if using api call
     try {
       const response = await fetch('http://api.givegetgo.xyz/v1/user/register', {
         method: 'POST',
@@ -46,54 +46,88 @@ const SignUpScreen: React.FC = () => {
         }),
       });
 
-      const json = await response.json(); // Parse the JSON response
+      const json = await response.json(); 
       console.log("Registration info", json);
 
       if (response.status === 201) {
         console.log('Registration successful:', json);
-        requestMFASetup();
-        navigation.navigate('CheckEmailScreen');
+        // requestMFASetup(); //comment if not using api call
+        // requestEmailVerificationCode(); //comment if not using api call
+        // navigation.navigate('CheckEmailScreen'); //comment if not using api call
       } else {
         // Handle different types of errors based on response status
-        console.error('Registration failed:', json.msg);
-        alert(`Registration failed: ${json.msg}`);
+        // console.error('Registration failed:', json.msg);  // uncomment this if using api
+        // alert(`Registration failed: ${json.msg}`); //uncomment if using api call
       }
     } catch (error) {
       // Handle network errors or other unexpected issues
-      console.error('Network error:', error);
-      alert('Failed to connect to the server. Please try again later.');
+      // console.error('Network error:', error);  // uncomment this if using api
+      // alert('Failed to connect to the server. Please try again later.'); //uncomment if using api call
     }
   }
 
   async function requestMFASetup() {
     try {
-      const response = await fetch('http://api.givegetgo.xyz/v1/mfa', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-        }),
-      });
-  
-      const json = await response.json(); // Parse the JSON response
-      console.log("MFA setup info", json);
-  
-      if (response.status === 200) {
-        console.log('MFA setup successful:', json);
-        // Here you can navigate or perform further actions upon successful setup
-      } else {
-        // Handle different types of errors based on response status
-        console.error('MFA setup failed:', json.msg);
-        alert(`MFA setup failed: ${json.msg}`);
-      }
+        const response = await fetch('http://api.givegetgo.xyz/v1/mfa', {
+            method: 'GET', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const jsonResponse = await response.json(); // Parse the JSON response
+
+        if (response.status === 200) {
+            console.log('MFA setup info:', jsonResponse);
+            // Process the successful response here if needed
+        } else if (response.status === 401) {
+            console.error('Invalid credentials:', jsonResponse.msg);
+            // Handle invalid credentials error
+        } else if (response.status === 500) {
+            console.error('Internal server error:', jsonResponse.msg);
+            // Handle internal server error
+        } else {
+            console.error('Unexpected error:', jsonResponse.msg);
+            // Handle other unexpected errors
+        }
     } catch (error) {
-      // Handle network errors or other unexpected issues
-      console.error('Network error:', error);
-      alert('Failed to connect to the server for MFA setup. Please try again later.');
+        console.error('Network error:', error);
+        // Handle network errors or other unexpected issues
     }
+}
+
+async function requestEmailVerificationCode() {
+  try {
+      const response = await fetch('http://api.givegetgo.xyz/verification/request-email', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      const jsonResponse = await response.json(); // Parse the JSON response
+
+      if (response.status === 200) {
+          console.log('Verification code sent:', jsonResponse.msg);
+          // Process the successful response here if needed
+      } else if (response.status === 400) {
+          console.error('Invalid request:', jsonResponse.msg);
+          // Handle invalid request error
+      } else if (response.status === 401) {
+          console.error('Invalid credentials:', jsonResponse.msg);
+          // Handle invalid credentials error
+      } else if (response.status === 500) {
+          console.error('Internal server error:', jsonResponse.msg);
+          // Handle internal server error
+      } else {
+          console.error('Unexpected error:', jsonResponse.msg);
+          // Handle other unexpected errors
+      }
+  } catch (error) {
+      console.error('Network error:', error);
+      // Handle network errors or other unexpected issues
   }
+}
 
   return (
     <View style={styles.container}>
