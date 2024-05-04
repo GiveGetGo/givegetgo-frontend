@@ -7,14 +7,15 @@ Ensure you have the following tools installed before you begin:
 
 ## Launching the App
 To start the application, follow these steps:
-1. Clone the Repo
-Please use the "development" branch
-`git clone https://github.com/GiveGetGo/givegetgo-mobile.git`
-2. Run the following command. It will start the Expo CLI server and open a new tab in your default web browser displaying a QR code.
+1. Clone the Repo (use the "development" branch)
+    ```
+    git clone https://github.com/GiveGetGo/givegetgo-mobile.git
+    ```
+3. Run the following command. It will start the Expo CLI server and open a new tab in your default web browser displaying a QR code.
     ```
     npm start
     ```
-3. Running on your Mobile Device:
+4. Running on your Mobile Device:
  - Scan the QR Code displayed in your browser with the Expo (Go) app.
  - After scanning, the app should start building and eventually launch on your device.
 4. Running on the Web:
