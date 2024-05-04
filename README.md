@@ -24,3 +24,6 @@ Press the "w" key in your terminal to launch the app on the web. This will open 
 ## Demonstration and Setup Notes
 This is a social app that requires multiple users to interact for optimal functionality. However, due to budget constraints, the team shut down the server after the final presentation. The [backend code](https://github.com/GiveGetGo/givegetgo-backend.git) is still available to run locally. To make the frontend repository ideal for demonstration, the team set up default datasets instead of API fetch calls for the best demo experience. The API call code is still available in the codebase, and you can modify it to use your server and data instead of the current default settings.
 
+## API Spec
+https://app.swaggerhub.com/apis/GIVEGETGO2023/GiveGetGo/1.0.0#/
+
